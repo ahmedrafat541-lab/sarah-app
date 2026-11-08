@@ -1,12 +1,14 @@
 // هنا تشفير و فك تشفير
 
 
+
+
 import crypto from "node:crypto"; 
+import { ENCRYPTION_KEY as key } from "../../../config/config.service.js";
 
 
 
-
-const ENCRYPTION_KEY = Buffer.from("13459845655644856qw4d6w5@!@#QEda")  ; 
+const ENCRYPTION_KEY = Buffer.from(key, 'utf8'); // Must be 256 bits (32 characters); 
 const IV_LENGTH = 16; // For AES, the IV is always 16 bytes
 
 export function Encrypt(plainText) {
@@ -38,10 +40,4 @@ let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
 decrypted += decipher.final('utf8');
 
 return decrypted;
-
 }
-
-
-
-
-

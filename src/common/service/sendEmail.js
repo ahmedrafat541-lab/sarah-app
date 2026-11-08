@@ -1,23 +1,25 @@
 import nodemailer from "nodemailer";
 import { randomInt } from 'node:crypto';
+import { EMAIL , PASS } from "../../../config/config.service.js";
 
 const sendEmail = async ({to , subject , html , attachments} ={})=>{
     const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-            user: "ahmedrafat541@gmail.com",
-            pass: "uotoxcajauomcxec"
+            user: EMAIL ,
+            pass: PASS
         }
     })
 
 
     const info = await transporter.sendMail({
-    from: '"3b8ny" <ahmedrafat541@gmail.com>',
+    from: `"3b8ny" ${EMAIL} `,
     to,
     subject,
     html:html || "" ,
     attachments: attachments || []
 });
+
 
 return info.accepted.length > 0 ? true : false
 

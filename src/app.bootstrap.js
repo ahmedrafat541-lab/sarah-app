@@ -35,7 +35,7 @@ const limiter = rateLimit({
         })
     }
 });
-app.use(limiter)
+
 
 // const allowOrigins = ["http//localhost:4000",
 //     "http//localhost:5000",
@@ -44,7 +44,7 @@ app.use(limiter)
 const bootstrap = async()=>{
 
     app.set("case sensitive routing" , true)
-    app.set(" strict routing" , true)
+    app.set("strict routing" , true)
     // بيسمح لاي موقع انو يتصل بالسرفر
     app.use(cors({origin: function (origin , callback){
         if([...ALLOW_ORIGINS , undefined].includes(origin)){
@@ -59,7 +59,7 @@ const bootstrap = async()=>{
     app.use(helmet());
     app.get("/" , (req , res  )=>{
 res.status(200).json({message:"hello nigga"})});
-
+app.use(limiter);
 
 await connectionDB();
 await connectionRedis();
@@ -75,8 +75,8 @@ app.use("{/*demo}" , (req , res ,next)=>{
 
 
     app.use(( err , req , res  , next)=>{
-        console.log(err);
-        res.status(err.cause || 500).json({message:err.message , stack:err.stack })
+       
+        res.status(err.cause || 500).json({message:err.message , stack:err.stack , statusCode:err.cause || 500 , errors:err.errors || [] })
     });
  
 

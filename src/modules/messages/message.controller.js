@@ -19,8 +19,8 @@ messageRouter.post("/"    ,
          MS.createMessage); 
 
 
-         messageRouter.get("/" , authentication , MS.getMessage); 
-         messageRouter.get("/:id" , authentication , MS.getMessageById); 
+messageRouter.get("/" , authentication , MS.getMessage); 
+messageRouter.get("/:id" , authentication , MS.getMessageById); 
 
 
 

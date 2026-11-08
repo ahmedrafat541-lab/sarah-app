@@ -14,7 +14,8 @@ export const Validation =(schema)=>{ return (req , res , next)=>{
            
             error.details.forEach((err)=>{errResult.push({message:err.message , path:err.path[0] , key})})}}
 
-    if(errResult.length){return res.status(400).json({message:" validation error" , error:errResult})}
+    if(errResult.length > 0){const error = new Error("validation error" , {cause:400});
+error.errors = errResult; throw error;}
            
 
 

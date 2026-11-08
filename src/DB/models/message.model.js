@@ -30,8 +30,4 @@ userId:{
 
 
 const messageModel = mongoose.models.message || mongoose.model("message" , messageSchema);
-
-
 export default messageModel 
-
-

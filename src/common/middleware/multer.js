@@ -17,13 +17,14 @@ export const multerLocal = ({customPath = "General"  , customTypes = []}) => {
     const storage = multer.diskStorage({
         // بتقول الملف يتحفظ فين
         destination: (req , file , cb)=>{
-            console.log(file);
+           
             cb(null ,fullPath)},
  
             
+            
 // بتقول اسمه ايه
      filename:(req , file , cb)=>{
-                console.log({file});
+                
                 // ال UUID بتمنع ان الملفين بنفس الاسم يتكتبوا فوق بعض
                  cb(null , randomUUID() + "__" + file.originalname)}
                 

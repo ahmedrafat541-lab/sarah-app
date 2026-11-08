@@ -28,6 +28,9 @@ userRouter.use("/:userId/messages" , messageRouter)
 
 
 
+
+
+
  
 userRouter.post("/signup"    , multerLocal({customPath:"admins" , customTypes:['image/jpeg']}).fields([{name:"attachment" , maxCount:1} , {name:"attachments" , maxCount:6}]) , Validation(signUpSchema), US.signUp); 
 userRouter.post("/signin" , Validation(signInSchema), US.signIn);

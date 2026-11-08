@@ -1,4 +1,5 @@
 node_modules
 uploads
+.env
 config/*
 !config/config.service.js

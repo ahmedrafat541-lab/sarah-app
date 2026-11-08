@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../../DB/models/user.model.js";
 import * as dbservice from "../../DB/service/DB.service.js";
 import { ttl } from "../../DB/service/redis.service.js";
+import { ACCESS_TOKEN_SIGNATURE } from "../../../config/config.service.js";
 
 
 export const authentication = async (req , res , next) =>{
@@ -15,7 +16,7 @@ export const authentication = async (req , res , next) =>{
 
     if(!authorization){ throw new Error("token not exist" , {cause:400}) } 
 // هنا بيتاكد انه سليم
-    const decoded = jwt.verify( authorization , "ahmedmeshahmed") ;
+    const decoded = jwt.verify( authorization , ACCESS_TOKEN_SIGNATURE) ;
     if(!decoded){throw new Error("invalid token" , {cause:400})} 
 // بيجيب بقى اليوزر من الداتا بيز بالايميل الي جوا التوكن
     const user  =await dbservice.findOne({

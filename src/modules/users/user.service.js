@@ -20,7 +20,7 @@ import sendEmail, { generate_otp } from "../../common/service/sendEmail.js";
 import { eventEmitter } from "../../common/utils/event.js";
 import { sendEmailOtp } from "./user.helper.js";
 import { success_response } from "../../common/utils/success.response.js";
-
+import {AUDIENCE , REFRESH_TOKEN_SIGNATURE , ACCESS_TOKEN_SIGNATURE} from "../../../config/config.service.js";
 
 
 
@@ -32,7 +32,7 @@ const client = new OAuth2Client();
 export const signUp = async (req , res , next)=>{
 
 
-    console.log(req.files)
+  
     const {fName , lName , email , password , age , gender , phone} = req.body ; 
     // const user = await userModel.create([{fName , lName , email , password , age , gender , phone }])
     // await dbservice.findOne({ model:userModel , filter: {email:email.toLowerCase()}})
@@ -103,8 +103,7 @@ export const reSendOtp = async (req , res , next)=>{
 
     await sendEmailOtp({email , isConfirmed:true})
  
-return res.status(201).json({message:"done" })
-}
+success_response({res, statusCode:201 ,data:{message:"done"}}) }
  
 
 
@@ -116,12 +115,12 @@ export const signUpWithGmail = async (req , res , next)=>{
 
     const {idToken}=req.body;
 
-    console.log({idToken})
+   
     
     // بشوف هة حقيقي ولا لا
   const decoded = await client.verifyIdToken({
       idToken ,
-      audience: "199384594082-p76fjog67gmiiqv6ckotkcoor1mfrq1t.apps.googleusercontent.com",
+      audience: AUDIENCE,
   });
   // بطلع بقى بيانات اليوزر
   const {family_name , given_name , picture , email_verified,email } = decoded.getPayload();
@@ -136,10 +135,10 @@ export const signUpWithGmail = async (req , res , next)=>{
 
 
 
-     const access_token = jwt.sign({id:user._id , email:user.email} , "ahmedmeshahmed" , {expiresIn:100});
-         const refresh_token = jwt.sign({id:user._id , email:user.email} , "ahmedmeshahmed gg" );
+     const access_token = jwt.sign({id:user._id , email:user.email} , ACCESS_TOKEN_SIGNATURE , {expiresIn:100});
+         const refresh_token = jwt.sign({id:user._id , email:user.email} , REFRESH_TOKEN_SIGNATURE );
 
-   return res.status(201).json({message:"done"  , tokens:{access_token , refresh_token} });
+success_response({res, statusCode:201 ,data:{tokens:{access_token , refresh_token}}})
 
   
     
@@ -166,10 +165,10 @@ export const signIn = async (req , res , next)=>{
 
 
 
-         const access_token = jwt.sign({id:user._id , email:user.email} , "ahmedmeshahmed" , {expiresIn:100 ,jwtid:tokenId});
-         const refresh_token = jwt.sign({id:user._id , email:user.email} , "ahmedmeshahmed gg" , {jwtid:tokenId});
+         const access_token = jwt.sign({id:user._id , email:user.email} , ACCESS_TOKEN_SIGNATURE , {expiresIn:100 ,jwtid:tokenId});
+         const refresh_token = jwt.sign({id:user._id , email:user.email} , REFRESH_TOKEN_SIGNATURE , {jwtid:tokenId});
 
-   return res.status(201).json({message:"done"  , tokens:{access_token , refresh_token} })
+success_response({res, statusCode:201 ,data:{tokens:{access_token , refresh_token}}})
 
 
 };
@@ -180,8 +179,7 @@ export const signIn = async (req , res , next)=>{
 
 
 export const getProfile = async (req  ,res , next)=>{
-    return res.status(200).json({message:"done" , user:req.user})
-} ;
+ success_response({res, statusCode:201 ,data:{user:req.user}}) };
  
 
 
@@ -196,17 +194,17 @@ export const refreshToken = async (req  ,res , next)=>{
 
 
     // اللوكشه دي كلها بتتحقق بال secret بتاع ال refresh وبتجيب اليوزر بال id و تعمله access جديد
-    const decoded = jwt.verify( authorization , "ahmedmeshahmed gg") ;
+    const decoded = jwt.verify( authorization , REFRESH_TOKEN_SIGNATURE); ;
     if(!decoded){throw new Error("invalid token" , {cause:404})}
     const user  =await dbservice.findOne({
         model:userModel , filter:{_id:decoded.id}
     })
     if(!user){throw new Error ("user not exist" , {cause:404})}
-    const access_token = jwt.sign({id:user._id , email:user.email} , "ahmedmeshahmed" , {expiresIn:100});
+    const access_token = jwt.sign({id:user._id , email:user.email} , ACCESS_TOKEN_SIGNATURE , {expiresIn:100});
 
 
 
-    return res.status(200).json({message:"done" , access_token})   };
+success_response({res, statusCode:201 ,data:{access_token}})  };
  
   
 
@@ -226,7 +224,7 @@ export const shareProfile = async (req  ,res , next)=>{
     if(!user){ throw new Error("user not exist" , {cause:404}) }
     user.phone = Decrypt(user.phone)
 
-    return res.status(200).json({message:"done" , user})
+    success_response({res, statusCode:200 ,data:{user}})
 } ;
 
 
@@ -246,7 +244,7 @@ export const updateProfile = async (req  ,res , next)=>{
    let user  =await dbservice.findByIdAndUpdate({
     model:userModel , id:req.user._id , update:updateQuery , options:{new:true , runValidators:true}
    })
-    return res.status(200).json({message:"done" , user})
+    success_response({res, statusCode:200 ,data:{user}})
 } ;
 
 
@@ -261,7 +259,7 @@ export const updatePassword = async (req  ,res , next)=>{
 
     req.user.password = await Hash(newPassword);
     await req.user.save();
-    return res.status(200).json({message:"done" , user:req.user})
+    success_response({res, statusCode:200 ,data:{message:"done" , user:req.user}})
 };
 
 
@@ -292,8 +290,7 @@ export const logout = async (req  ,res , next)=>{
 
 
    
-    return res.status(200).json({message:"done"})
-};
+  success_response({res, statusCode:201 ,data:{message:"done"}}) };
 
 
 
@@ -340,11 +337,7 @@ export const confirmEmail = async (req, res , next)=>{
 
     await deleteKey(`otp::${email}`)
 
-    return res.status(200).json({message:"done" , user})
-
-
-}
-
+    success_response({res, statusCode:201 ,data:{message:"done"}}) };
 
 
 
@@ -359,7 +352,7 @@ export const forgetPassword = async (req, res , next )=> {
     await sendEmailOtp({email , isConfirmed:true , subject:"forget password"})
 
 
-return res.status(200).json({message:"done"})
+success_response({res, statusCode:201 ,data:{message:"done"}})
 
 }
 
@@ -398,7 +391,7 @@ export const resetPassword = async (req, res , next )=> {
 
 
 
-return res.status(200).json({message:"done"})
+success_response({res, statusCode:201 ,data:{message:"done"}})
 
 }
 
